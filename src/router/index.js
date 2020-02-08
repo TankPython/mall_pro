@@ -5,6 +5,9 @@ import Home from '@/components/home/home.vue'
 import User from '@/components/User/user.vue'
 import Rights from '@/components/rights/rights.vue'
 import Roles from '@/components/rights/roles.vue'
+import Goods from '@/components/goods/goods.vue'
+import GoodsAdd from '@/components/goods/goodsAdd.vue'
+import Params from '@/components/goods/params.vue'
 import { Message } from 'element-ui'
 
 Vue.use(Router)
@@ -26,6 +29,18 @@ const router = new Router({
       name: 'roles',
       path: '/roles',
       component: Roles
+    }, {
+      name: 'goods',
+      path: '/goods',
+      component: Goods
+    }, {
+      name: 'goodsAdd',
+      path: '/goods/add',
+      component: GoodsAdd
+    }, {
+      name: 'params',
+      path: '/params',
+      component: Params
     }]
   },
   {
@@ -38,9 +53,7 @@ const router = new Router({
 })
 
 router.beforeEach((to, from, next) => {
-  console.log(to.path, '---hahaha-------------************-', from.path)
   if (to.path !== '/login') {
-    console.log('-----------99999')
     const token = sessionStorage.getItem('token')
     if (!token) {
       router.push({ name: 'login' })
