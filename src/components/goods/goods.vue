@@ -46,57 +46,57 @@
 <script>
 export default {
   methods: {
-    goodsAdd() {
-      this.$router.push({ name: "goodsAdd" });
+    goodsAdd () {
+      this.$router.push({ name: 'goodsAdd' })
     },
     // 加载用户列表
-    async loadGoodslist() {
-      console.log("load---");
+    async loadGoodslist () {
+      console.log('load---')
 
       const res = await this.$http.get(
-        "goods" +
+        'goods' +
           `?query=${this.searchValue}&pagenum=${this.pagenum}&pagesize=${this.pagesize}`
-      );
+      )
       const {
         data: { goods, total },
         meta: { msg, status }
-      } = res.data;
+      } = res.data
       if (status === 200) {
-        this.tableData = goods;
-        this.$message.success(msg);
-        this.total = total;
-        console.log("total=", total);
+        this.tableData = goods
+        this.$message.success(msg)
+        this.total = total
+        console.log('total=', total)
       } else {
-        this.$message.warning(msg);
+        this.$message.warning(msg)
       }
-      console.log("users=====", res.data);
+      console.log('users=====', res.data)
     },
     // 页码尺寸改变
-    handleSizeChange(val) {
-      this.pagenum = 1;
-      this.pagesize = val;
-      this.loadGoodslist();
+    handleSizeChange (val) {
+      this.pagenum = 1
+      this.pagesize = val
+      this.loadGoodslist()
       // console.log(`每页 ${val} 条`)
     },
-    handleCurrentChange(val) {
-      this.pagenum = val;
-      this.loadGoodslist();
+    handleCurrentChange (val) {
+      this.pagenum = val
+      this.loadGoodslist()
       // console.log(`当前页: ${val}`)
     }
   },
-  mounted() {
-    this.loadGoodslist();
+  mounted () {
+    this.loadGoodslist()
   },
-  data() {
+  data () {
     return {
-      searchValue: "",
+      searchValue: '',
       tableData: [],
       pagenum: 1,
       pagesize: 10,
       total: 1
-    };
+    }
   }
-};
+}
 </script>
 
 <style>

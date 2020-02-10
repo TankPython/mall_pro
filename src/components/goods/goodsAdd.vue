@@ -89,134 +89,130 @@
 </template>
 
 <script>
-import "quill/dist/quill.core.css";
-import "quill/dist/quill.snow.css";
-import "quill/dist/quill.bubble.css";
+import 'quill/dist/quill.core.css'
+import 'quill/dist/quill.snow.css'
+import 'quill/dist/quill.bubble.css'
 
-import { quillEditor } from "vue-quill-editor";
+import { quillEditor } from 'vue-quill-editor'
 export default {
   components: {
     quillEditor
   },
-  data() {
+  data () {
     return {
-      headers: { Authorization: sessionStorage.getItem("token") },
-      active: "1",
+      headers: { Authorization: sessionStorage.getItem('token') },
+      active: '1',
       form: {
         pics: []
       },
       options: [],
       catgloryValue: [],
       props: {
-        expandTrigger: "hover",
-        label: "cat_name",
-        children: "children",
-        value: "cat_id"
+        expandTrigger: 'hover',
+        label: 'cat_name',
+        children: 'children',
+        value: 'cat_id'
       },
       dynamicPara: [],
       staticData: [],
       fileList: []
-    };
+    }
   },
   methods: {
-    leave() {
-      if (this.active === "1") {
+    leave () {
+      if (this.active === '1') {
         if (this.catgloryValue.length !== 3) {
-          this.$message.error("请选择三级分类");
-          return false;
+          this.$message.error('请选择三级分类')
+          return false
         }
       }
-      return true;
+      return true
     },
     //   添加商品
-    async addGoods() {
-      console.log("add--");
-      var attrs = [];
+    async addGoods () {
+      console.log('add--')
+      var attrs = []
       this.dynamicPara.forEach(el => {
         el.attr_vals.forEach(el1 => {
-          attrs.push({ attr_id: el.attr_id, attr_value: el1 });
-        });
-      });
+          attrs.push({ attr_id: el.attr_id, attr_value: el1 })
+        })
+      })
       var form = {
         goods_name: this.form.goods_name,
         goods_price: this.form.goods_price,
         goods_number: this.form.goods_number,
         goods_weight: this.form.goods_weight,
         goods_introduce: this.form.goods_introduce,
-        goods_cat: this.catgloryValue.join(","),
+        goods_cat: this.catgloryValue.join(','),
         attrs: attrs,
         pics: this.form.pics
-      };
-      const res = await this.$http.post("goods", form);
+      }
+      const res = await this.$http.post('goods', form)
       const {
         data,
-        meta: { status, msg }
-      } = res.data;
-      console.log("----888----", form);
-      this.$message.info(msg);
-      console.log(res.data);
-      this.$router.push({ name: "goods" });
+        meta: { msg }
+      } = res.data
+      console.log('----888----', form)
+      this.$message.info(msg)
+      console.log(data)
+      this.$router.push({ name: 'goods' })
     },
-    handleRemove(file, fileList) {
+    handleRemove (file, fileList) {
       var index = this.form.pics.findIndex(el => {
-        return file.name === el.pic;
-      });
-      this.form.pics.splice(index, 1);
+        return file.name === el.pic
+      })
+      this.form.pics.splice(index, 1)
     },
-    handleSuccess(response, file, fileList) {
-      console.log(response);
+    handleSuccess (response, file, fileList) {
+      console.log(response)
       this.form.pics.push({
         pic: response.data.tmp_path
-      });
+      })
     },
-    async tab_click() {
-
+    async tab_click () {
       // 商品动态参数
-      if (this.active == "2") {
-        console.log(this.catgloryValue.length, "-----lengh");
+      if (this.active === '2') {
+        console.log(this.catgloryValue.length, '-----lengh')
         const res = await this.$http.get(
           `categories/${this.catgloryValue[2]}/attributes?sel=many`
-        );
-        console.log("dy=", res.data);
+        )
+        console.log('dy=', res.data)
         const {
-          data,
-          meta: { status, msg }
-        } = res.data;
-        this.dynamicPara = data;
+          data
+        } = res.data
+        this.dynamicPara = data
         this.dynamicPara.forEach(item => {
-          item.attr_vals = item.attr_vals ? item.attr_vals.split(" ") : [];
-        });
+          item.attr_vals = item.attr_vals ? item.attr_vals.split(' ') : []
+        })
       }
-      //商品静态参数
-      if (this.active == "3") {
+      // 商品静态参数
+      if (this.active === '3') {
         const res = await this.$http.get(
           `categories/${this.catgloryValue[2]}/attributes?sel=only`
-        );
-        console.log("static=", res.data);
+        )
+        console.log('static=', res.data)
         const {
-          data,
-          meta: { status, msg }
-        } = res.data;
-        this.staticData = data;
+          data
+        } = res.data
+        this.staticData = data
       }
     },
     // 获取三级分类
-    async loadCategoties() {
-      const res = await this.$http.get("categories", { type: 3 });
+    async loadCategoties () {
+      const res = await this.$http.get('categories', { type: 3 })
       const {
-        data,
-        meta: { status, msg }
-      } = res.data;
-      this.options = data;
+        data
+      } = res.data
+      this.options = data
     },
-    handleChange(value) {
-      this.dynamicPara = [];
+    handleChange (value) {
+      this.dynamicPara = []
     }
   },
-  mounted() {
-    this.loadCategoties();
+  mounted () {
+    this.loadCategoties()
   }
-};
+}
 </script>
 <style>
 </style>

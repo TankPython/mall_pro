@@ -99,99 +99,96 @@
 
 <script>
 export default {
-  data() {
+  data () {
     return {
       inputVisible: false,
-      inputValue: "",
+      inputValue: '',
       staticData: [],
       dynamicPara: [],
-      active: "1",
+      active: '1',
       options: [],
       catgloryValue: [],
       props: {
-        expandTrigger: "hover",
-        label: "cat_name",
-        children: "children",
-        value: "cat_id"
+        expandTrigger: 'hover',
+        label: 'cat_name',
+        children: 'children',
+        value: 'cat_id'
       }
-    };
-  },
-  methods: {
-    handleInputConfirm(row) {
-      let inputValue = this.inputValue;
-      if (inputValue) {
-        row.attr_vals.push(inputValue);
-        console.log("row=", row);
-      }
-      this.inputVisible = false;
-      this.inputValue = "";
-    },
-    showInput() {
-      this.inputVisible = true;
-      this.$nextTick(_ => {
-        this.$refs.saveTagInput.$refs.input.focus();
-      });
-    },
-    tab_click() {
-      if (this.catgloryValue.length < 3) return;
-
-      if (this.active == "1") {
-        this.loadDynamicData();
-      }
-      if (this.active == "2") {
-        this.loadStaticData();
-      }
-    },
-    handleChange() {
-      if (this.catgloryValue.length < 3) {
-        this.dynamicPara = [];
-        this.staticData = [];
-        return;
-      }
-      this.loadDynamicData();
-      this.loadStaticData();
-    },
-    async loadCategoties() {
-      const res = await this.$http.get("categories", { type: 3 });
-      const {
-        data,
-        meta: { status, msg }
-      } = res.data;
-      this.options = data;
-    },
-    async loadDynamicData() {
-      const res = await this.$http.get(
-        `categories/${this.catgloryValue[2]}/attributes?sel=many`
-      );
-      console.log("dy=", res.data);
-      const {
-        data,
-        meta: { status, msg }
-      } = res.data;
-      this.dynamicPara = data;
-      this.dynamicPara.forEach(item => {
-        item.attr_vals = item.attr_vals ? item.attr_vals.split(" ") : [];
-      });
-    },
-    async loadStaticData() {
-      const res = await this.$http.get(
-        `categories/${this.catgloryValue[2]}/attributes?sel=only`
-      );
-      console.log("static=", res.data);
-      const {
-        data,
-        meta: { status, msg }
-      } = res.data;
-      this.staticData = data;
-      this.staticData.forEach(item => {
-        item.attr_vals = item.attr_vals ? item.attr_vals.split(" ") : [];
-      });
     }
   },
-  mounted() {
-    this.loadCategoties();
+  methods: {
+    handleInputConfirm (row) {
+      let inputValue = this.inputValue
+      if (inputValue) {
+        row.attr_vals.push(inputValue)
+        console.log('row=', row)
+      }
+      this.inputVisible = false
+      this.inputValue = ''
+    },
+    showInput () {
+      this.inputVisible = true
+      this.$nextTick(_ => {
+        this.$refs.saveTagInput.$refs.input.focus()
+      })
+    },
+    tab_click () {
+      if (this.catgloryValue.length < 3) return
+
+      if (this.active === '1') {
+        this.loadDynamicData()
+      }
+      if (this.active === '2') {
+        this.loadStaticData()
+      }
+    },
+    handleChange () {
+      if (this.catgloryValue.length < 3) {
+        this.dynamicPara = []
+        this.staticData = []
+        return
+      }
+      this.loadDynamicData()
+      this.loadStaticData()
+    },
+    async loadCategoties () {
+      const res = await this.$http.get('categories', { type: 3 })
+      const {
+        data
+      } = res.data
+      this.options = data
+    },
+    async loadDynamicData () {
+      const res = await this.$http.get(
+        `categories/${this.catgloryValue[2]}/attributes?sel=many`
+      )
+      console.log('dy=', res.data)
+      const {
+        data
+      } = res.data
+      this.dynamicPara = data
+      this.dynamicPara.forEach(item => {
+        item.attr_vals = item.attr_vals ? item.attr_vals.split(' ') : []
+      })
+    },
+    async loadStaticData () {
+      const res = await this.$http.get(
+        `categories/${this.catgloryValue[2]}/attributes?sel=only`
+      )
+      console.log('static=', res.data)
+      const {
+        data
+      } = res.data
+      this.staticData = data
+      this.staticData.forEach(item => {
+        item.attr_vals = item.attr_vals ? item.attr_vals.split(' ') : []
+      })
+    }
+  },
+  mounted () {
+    this.loadCategoties()
   }
-};
+}
 </script>
 
 <style>
