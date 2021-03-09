@@ -1,15 +1,17 @@
 <template>
-  <div class="login-wrap">
+  <div class="register-wrap">
     <el-form label-position="top" label-width="80px" :model="user" class="login-form">
-      <h1>用户登录</h1>
+      <h1>用户注册</h1>
       <el-form-item label="用户名">
         <el-input v-model="user.username"></el-input>
       </el-form-item>
       <el-form-item label="密码">
         <el-input v-model="user.password"></el-input>
       </el-form-item>
-      <el-button type="primary" @click="login" class="login-button">登录</el-button>
-       <el-link class="register_link" @click="register" target="_blank">注册</el-link>
+       <el-form-item label="再次输入密码">
+        <el-input v-model="user.password2"></el-input>
+      </el-form-item>
+      <el-button type="primary" @click="register" class="register-button">注册</el-button>
     </el-form>
   </div>
 </template>
@@ -20,12 +22,13 @@ export default {
     return {
       user: {
         username: '',
-        password: ''
+        password: '',
+        password2: '',
       }
     }
   },
   methods: {
-    async login () {
+    async register () {
       const res = await this.$http.post('login', this.user)
       const data = res.data
       const { meta: { status, msg } } = data
@@ -37,16 +40,16 @@ export default {
       } else {
         this.$message.error(msg)
       }
-    },
-    async register () {
-      this.$router.push({'name': 'register'})
     }
+
+
+
   }
 }
 </script>
 
 <style>
-.login-wrap {
+.register-wrap {
     background-color: #324152;
     height: 100%;
     width: 100%;
@@ -55,17 +58,14 @@ export default {
     justify-content: center;
     align-items: center;
 }
-.login-form{
+.register-form{
      width: 400px;
     background-color:#fff;
     padding: 30px;
     border-radius: 5px;
 }
-.login-button {
+.register-button {
   width: 100%;
 }
-.register_link {
-  float: right;
-  margin-top: 20px;
-}
+
 </style>

@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Login from '@/components/login/login.vue'
+import Register from '@/components/register/register.vue'
 import Home from '@/components/home/home.vue'
 import User from '@/components/User/user.vue'
 import Rights from '@/components/rights/rights.vue'
@@ -22,43 +23,54 @@ const router = new Router({
       name: 'user',
       path: '/users',
       component: User
-    }, {
+    }, 
+    {
       name: 'rights',
       path: '/rights',
       component: Rights
-    }, {
+    },
+     {
       name: 'roles',
       path: '/roles',
       component: Roles
-    }, {
+    },
+    {
       name: 'goods',
       path: '/goods',
       component: Goods
-    }, {
+    },
+     {
       name: 'goodsAdd',
       path: '/goods/add',
       component: GoodsAdd
-    }, {
+    },
+     {
       name: 'params',
       path: '/params',
       component: Params
-    }, {
+    }, 
+    {
       name: 'categories',
       path: '/categories',
       component: Categories
-    }]
+    }
+  ]
   },
   {
     name: 'login',
     path: '/login',
     component: Login
+  },
+  {
+    name: 'register',
+    path: '/register',
+    component: Register
   }
-
   ]
 })
 
 router.beforeEach((to, from, next) => {
-  if (to.path !== '/login') {
+  if (to.path !== '/login' & to.path !== '/register') {
     const token = sessionStorage.getItem('token')
     if (!token) {
       router.push({ name: 'login' })

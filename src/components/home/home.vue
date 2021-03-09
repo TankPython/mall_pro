@@ -9,7 +9,7 @@
         </el-col>
         <el-col :span="18" class="middle">
           <div>
-            <h2 class="wordh2">后台管理系统</h2>
+            <h2 class="wordh2">办公管理系统</h2>
           </div>
         </el-col>
         <el-col :span="2" class="loginout">
