@@ -19,6 +19,8 @@
         </el-col>
       </el-row>
     </el-header>
+
+    
     <el-container class="container2">
       <el-aside width="200px" style="background-color: rgb(238, 241, 246)">
         <el-menu default-active="2" class="menu" :router="true" :unique-opened="true">
@@ -28,7 +30,7 @@
               <span>{{item.authName}}</span>
             </template>
 
-            <el-menu-item :index="'/'+item1.path" v-for="(item1,i1) in item.children" :key="i1">
+            <el-menu-item :index="item1.path" v-for="(item1,i1) in item.children" :key="i1">
               <i class="el-icon-setting"></i>
               {{item1.authName}}
             </el-menu-item>
@@ -39,6 +41,8 @@
         <router-view></router-view>
       </el-main>
     </el-container>
+
+
   </el-container>
 </template>
 
@@ -65,7 +69,7 @@ export default {
       this.$message.success('退出成功')
     },
     async getMenus () {
-      const res = await this.$http.get(`menus`)
+      const res = await this.$http.get(`menu`)
       console.log('menus=', res.data)
       const {
         data,

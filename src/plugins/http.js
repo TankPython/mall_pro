@@ -18,7 +18,7 @@ httpHelper.install = function fn (Vue) {
     return Promise.reject(error)
   })
 
-  axios.defaults.baseURL = 'http://127.0.0.1:8888/api/private/v1'
+  axios.defaults.baseURL = 'http://127.0.0.1:8000/api'
   Vue.prototype.$http = axios
 }
 

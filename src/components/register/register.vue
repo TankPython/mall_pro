@@ -1,51 +1,98 @@
 <template>
   <div class="register-wrap">
-    <el-form label-position="top" label-width="80px" :model="user" class="login-form">
-      <h1>用户注册</h1>
-      <el-form-item label="用户名">
-        <el-input v-model="user.username"></el-input>
-      </el-form-item>
-      <el-form-item label="密码">
-        <el-input v-model="user.password"></el-input>
-      </el-form-item>
-       <el-form-item label="再次输入密码">
-        <el-input v-model="user.password2"></el-input>
-      </el-form-item>
-      <el-button type="primary" @click="register" class="register-button">注册</el-button>
-    </el-form>
+
+<el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
+    <el-form-item label="名字" prop="name">
+    <el-input v-model="ruleForm.name"></el-input>
+  </el-form-item>
+   <el-form-item label="邮箱" prop="email">
+    <el-input v-model="ruleForm.email"></el-input>
+  </el-form-item>
+   <el-form-item label="手机号" prop="phone">
+    <el-input v-model="ruleForm.phone"></el-input>
+  </el-form-item>
+  <el-form-item label="密码" prop="password">
+    <el-input type="password" v-model="ruleForm.password" autocomplete="off"></el-input>
+  </el-form-item>
+  <el-form-item label="确认密码" prop="checkPass">
+    <el-input type="password" v-model="ruleForm.checkPass" autocomplete="off"></el-input>
+  </el-form-item>
+
+  <el-form-item>
+    <el-button type="primary" @click="submitForm('ruleForm')">提交</el-button>
+  </el-form-item>
+</el-form>
+
   </div>
 </template>
 
 <script>
-export default {
-  data () {
-    return {
-      user: {
-        username: '',
-        password: '',
-        password2: '',
+  export default {
+    data() {
+      var checkEmpty = (rule, value, callback) => {
+        if (!value) {
+          return callback(new Error('名字不能为空'));
+        }
+      };
+
+      var validatePass = (rule, value, callback) => {
+        if (value === '') {
+          callback(new Error('请输入密码'));
+        } else {
+          if (this.ruleForm.checkPass !== '') {
+            this.$refs.ruleForm.validateField('checkPass');
+          }
+          callback();
+        }
+      };
+
+      var validatePass2 = (rule, value, callback) => {
+        if (value === '') {
+          callback(new Error('请再次输入密码'));
+        } else if (value !== this.ruleForm.password) {
+          callback(new Error('两次输入密码不一致!'));
+        } else {
+          callback();
+        }
+      };
+
+      return {
+        ruleForm: {
+          password: '',
+          name: '',
+          email: '',
+          phone: ''
+        },
+        rules: {
+          password: [
+            { validator: validatePass, trigger: 'blur' }
+          ],
+          checkPass: [
+            { validator: validatePass2, trigger: 'blur' }
+          ],
+          name: [
+            { validator: checkEmpty, trigger: 'blur' }
+          ]
+        }
+      };
+
+    },
+
+    methods: {
+        async submitForm (ruleForm) {
+        const res = await this.$http.post(`register/`,this.ruleForm)
+        const {
+          meta: { msg, status }
+        } = res.data
+        if (status === 200) {
+          this.$message.success(msg)
+          this.$router.push({'name': 'login'})
+        } else {
+          this.$message.warning(msg)
+        }
       }
     }
-  },
-  methods: {
-    async register () {
-      const res = await this.$http.post('login', this.user)
-      const data = res.data
-      const { meta: { status, msg } } = data
-      if (status === 200) {
-        const token = data.data.token
-        sessionStorage.setItem('token', token)
-        this.$message.success(msg)
-        this.$router.push({'name': 'home'})
-      } else {
-        this.$message.error(msg)
-      }
-    }
-
-
-
   }
-}
 </script>
 
 <style>
@@ -57,15 +104,7 @@ export default {
     /* 水平居中 */
     justify-content: center;
     align-items: center;
-}
-.register-form{
-     width: 400px;
-    background-color:#fff;
-    padding: 30px;
-    border-radius: 5px;
-}
-.register-button {
-  width: 100%;
-}
+};
+
 
 </style>

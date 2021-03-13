@@ -17,23 +17,13 @@
 
     <el-table :data="tableData" style="width: 100%; margin-top: 15px;">
       <el-table-column type="index" prop="index" label="#"></el-table-column>
-      <el-table-column prop="username" label="姓名"></el-table-column>
+      <el-table-column prop="name" label="姓名"></el-table-column>
       <el-table-column prop="email" label="邮箱"></el-table-column>
-      <el-table-column prop="mobile" label="电话"></el-table-column>
+      <el-table-column prop="phone" label="电话"></el-table-column>
 
       <el-table-column label="创建日期">
         <template slot-scope="dataTable">
           <div>{{dataTable.row.create_time|dateFmt('YYYY-MM-DD')}}</div>
-        </template>
-      </el-table-column>
-
-      <el-table-column prop="mg_state" label="用户状态">
-        <template slot-scope="dataTable">
-          <el-switch
-            v-model="dataTable.row.mg_state"
-            active-color="#13ce66"
-            inactive-color="#ff4949"
-          ></el-switch>
         </template>
       </el-table-column>
 
@@ -85,16 +75,16 @@
     <el-dialog title="添加用户" :visible.sync="dialogFormAddVisible">
       <el-form :model="form">
         <el-form-item label="用户名" label-width="120px">
-          <el-input v-model="form.username" autocomplete="off"></el-input>
+          <el-input v-model="form.name" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="密码" label-width="120px">
-          <el-input v-model="form.password" autocomplete="off"></el-input>
+          <el-input v-model="form.password" autocomplete="off" show-password></el-input>
         </el-form-item>
         <el-form-item label="邮箱" label-width="120px">
           <el-input v-model="form.email" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="手机" label-width="120px">
-          <el-input v-model="form.mobile" autocomplete="off"></el-input>
+          <el-input v-model="form.phone" autocomplete="off"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -107,13 +97,13 @@
     <el-dialog title="编辑用户" :visible.sync="dialogFormEditVisible">
       <el-form :model="form">
         <el-form-item label="用户名" label-width="120px">
-          <el-input v-model="form.username" autocomplete="off"></el-input>
+          <el-input v-model="form.name" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="邮箱" label-width="120px">
           <el-input v-model="form.email" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="手机" label-width="120px">
-          <el-input v-model="form.mobile" autocomplete="off"></el-input>
+          <el-input v-model="form.phone" autocomplete="off"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -130,12 +120,12 @@
         </el-form-item>
 
         <el-form-item label="分配角色">
-          <el-select v-model="rid">
+          <el-select v-model="role_id">
             <el-option disabled label="请选择" :value="-1"></el-option>
             <el-option
               v-for="(item,index) in roles"
               :key="index"
-              :label="item.roleName"
+              :label="item.name"
               :value="item.id"
             ></el-option>
           </el-select>
@@ -164,7 +154,7 @@ export default {
       total: 1,
       username: '',
       userid: '',
-      rid: -1,
+      role_id: -1,
       roles: [],
       a: 9999
     }
@@ -185,19 +175,19 @@ export default {
 
     // 设置用户对话框
     async SetDialog (user) {
-      this.username = user.username
+      this.username = user.name
       this.userid = user.id
-      const res1 = await this.$http.get('roles/')
+      const res1 = await this.$http.get('role/')
       console.log('-----roles', res1.data)
       if (res1.data.meta.status === 200) {
-        this.roles = res1.data.data
-        const res2 = await this.$http.get('users/' + user.id)
+        this.roles = res1.data.data.results
+        const res2 = await this.$http.get('user/?id='+user.id)
         const data = res2.data
         console.log('-----currentuser', data)
         const msg = data.meta.msg
         this.dialogFormSetVisible = true
         if (data.meta.status === 200) {
-          this.rid = data.data.rid
+          this.role_id = data.data.role_id
           this.$message.success(msg)
         }
       } else {
@@ -205,20 +195,37 @@ export default {
       }
     },
 
+       // 设置用户角色
+    async setUser () {
+      this.dialogFormSetVisible = false
+
+      const res = await this.$http.put('user/',{'role_id': this.role_id,'id':this.userid})
+      const {
+        meta: { msg, status }
+      } = res.data
+      if (status === 200) {
+        this.$message.success(msg)
+      } else {
+        this.$message.warning(msg)
+      }
+      this.form = {}
+      this.loadUserlist()
+    },
+
     // 加载用户列表
     async loadUserlist () {
       console.log('load---')
 
       const res = await this.$http.get(
-        'users' +
+        'user' +
           `?query=${this.searchValue}&pagenum=${this.pagenum}&pagesize=${this.pagesize}`
       )
       const {
-        data: { users, total },
+        data: { results, total },
         meta: { msg, status }
       } = res.data
       if (status === 200) {
-        this.tableData = users
+        this.tableData = results
         this.$message.success(msg)
         this.total = total
         console.log('total=', total)
@@ -232,7 +239,7 @@ export default {
     async addUser () {
       this.dialogFormAddVisible = false
 
-      const res = await this.$http.post('users', this.form)
+      const res = await this.$http.post('user/', this.form)
       this.form = {}
       const {
         data: { users },
@@ -251,7 +258,7 @@ export default {
     async editUser () {
       this.dialogFormEditVisible = false
 
-      const res = await this.$http.put('users/' + this.form.id, this.form)
+      const res = await this.$http.put('user/', this.form)
       const {
         meta: { msg, status }
       } = res.data
@@ -264,22 +271,7 @@ export default {
       this.loadUserlist()
     },
 
-    // 设置用户角色
-    async setUser () {
-      this.dialogFormSetVisible = false
-
-      const res = await this.$http.put('users/' + this.userid + '/role', {'rid': this.rid})
-      const {
-        meta: { msg, status }
-      } = res.data
-      if (status === 200) {
-        this.$message.success(msg)
-      } else {
-        this.$message.warning(msg)
-      }
-      this.form = {}
-      this.loadUserlist()
-    },
+ 
 
     // 删除用户
     delUser (id) {
@@ -290,7 +282,7 @@ export default {
         center: true
       })
         .then(async () => {
-          const res = await this.$http.delete(`users/${id}`)
+          const res = await this.$http.delete(`user/?id=${id}`)
           const data = res.data
           // console.log(data)
           const {

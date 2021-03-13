@@ -5,6 +5,8 @@
     <bread level1="权限管理" level2="角色列表" style=" margin-top: 15px;"></bread>
 
     <el-table :data="tableData" style="width: 100%; margin-top: 15px;">
+
+
       <el-table-column type="expand" label>
         <template slot-scope="dataTable">
           <el-row v-for="(item,index) in dataTable.row.children" :key="index" class="el-row-level1">
@@ -39,9 +41,10 @@
           <h2 v-if="dataTable.row.children.length==0">没有权限</h2>
         </template>
       </el-table-column>
+
       <el-table-column type="index" prop="index" label="#"></el-table-column>
-      <el-table-column prop="roleName" label="角色名称"></el-table-column>
-      <el-table-column prop="roleDesc" label="描述"></el-table-column>
+      <el-table-column prop="name" label="角色名称"></el-table-column>
+      <el-table-column prop="desc" label="描述"></el-table-column>
 
       <el-table-column prop label="操作">
         <template slot-scope="dataTable">
@@ -67,7 +70,7 @@
           <el-button
             type="danger"
             icon="el-icon-delete"
-            @click="delUser(dataTable.row.id)"
+            @click="delRole(dataTable.row.id)"
             plain
             circle
           ></el-button>
@@ -90,6 +93,39 @@
         <el-button type="primary" @click="setRoleRights">确 定</el-button>
       </div>
     </el-dialog>
+
+
+ <el-dialog title="添加角色" :visible.sync="dialogFormAddVisible">
+      <el-form :model="form">
+        <el-form-item label="名字" label-width="120px">
+          <el-input v-model="form.name" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="描述" label-width="120px">
+          <el-input v-model="form.desc" autocomplete="off"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormAddVisible = false , form={}">取 消</el-button>
+        <el-button type="primary" @click="addRole">确 定</el-button>
+      </div>
+    </el-dialog>
+
+    <el-dialog title="编辑角色" :visible.sync="dialogFormEditVisible">
+      <el-form :model="form">
+        <el-form-item label="名字" label-width="120px">
+          <el-input v-model="form.name" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="描述" label-width="120px">
+          <el-input v-model="form.desc" autocomplete="off"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormEditVisible = false , form={}">取 消</el-button>
+        <el-button type="primary" @click="editRole">确 定</el-button>
+      </div>
+    </el-dialog>
+
+    
   </div>
 </template>
 
@@ -97,11 +133,14 @@
 export default {
   data () {
     return {
+      form:{},
       currentRid: -1,
       tableData: [],
       checkedId: [],
       treeData: [],
       dialogFormSetVisible: false,
+      dialogFormAddVisible:false,
+      dialogFormEditVisible:false,
       defaultProps: {
         children: 'children',
         label: 'authName'
@@ -109,6 +148,7 @@ export default {
     }
   },
   methods: {
+    // 设置用户角色method
     async setRoleRights () {
       this.dialogFormSetVisible = false
       console.log('orign=', this.checkedId)
@@ -118,17 +158,19 @@ export default {
       console.log('halfchecked=', halfChecked)
       // 发送请求修改权限
       var totalChecked = [...checked, ...halfChecked]
-      const res = await this.$http.post(`roles/${this.currentRid}/rights`, {rids: totalChecked.join(',')})
+      const res = await this.$http.put(`role/`, {ps_ids: totalChecked.join(','),id:this.currentRid})
       console.log(res.data)
       this.loadroles()
     },
+
+    // 设置用户角色界面method
     async SetDialog (row) {
       this.currentRid = row.id
       console.log('this.currentRid=', this.currentRid)
       this.dialogFormSetVisible = true
       // 显示所有的权限
       console.log('load---')
-      const res = await this.$http.get('rights/tree')
+      const res = await this.$http.get('menu/')
       const {
         data,
         meta: { msg, status }
@@ -140,13 +182,11 @@ export default {
         // 展示拥有的权限
         var templist = []
         console.log('row---', row)
+        // 只添加权限的最后一级就行
         row.children.forEach(item => {
           // templist.push(item.id);
           item.children.forEach(item1 => {
-            // templist.push(item1.id);
-            item1.children.forEach(item2 => {
-              templist.push(item2.id)
-            })
+            templist.push(item1.id);
           })
         })
         this.checkedId = templist
@@ -154,33 +194,99 @@ export default {
         this.$message.warning(msg)
       }
     },
+
+
+    // 删除角色method
+    async delRole (id) {
+        const res = await this.$http.delete(`role/?id=${id}`)
+        const data = res.data
+        const {
+          meta: { status, msg }
+        } = data
+
+        if (status === 200) {
+          // 删除成功 重新加载数据
+          this.loadroles()
+        } else {
+          this.$message({
+            type: 'success',
+            message: msg
+          })
+        }
+    },
+
+    // 请求角色列表method
     async loadroles () {
       console.log('load---')
 
-      const res = await this.$http.get('roles')
+      const res = await this.$http.get('role')
       const {
-        data,
+        data:{results},
         meta: { msg, status }
       } = res.data
       if (status === 200) {
-        this.tableData = data
+        this.tableData = results
         this.$message.success(msg)
       } else {
         this.$message.warning(msg)
       }
       console.log('roles=====', res.data)
     },
-    openAddDialog () {},
+
+    // 添加角色界面method
+    openAddDialog () {
+      this.form = {}
+      this.dialogFormAddVisible = true
+    },
+
+    async addRole(){
+       this.dialogFormAddVisible = false
+
+      const res = await this.$http.post('role/', this.form)
+      this.form = {}
+      const {
+        meta: { msg, status }
+      } = res.data
+      if (status === 200) {
+        this.$message.success(msg)
+      } else {
+        this.$message.warning(msg)
+      }
+      this.loadroles()
+    },
+
+     // 编辑用户对话框
+    editDialog (role) {
+      this.form = role
+      this.dialogFormEditVisible = true
+    },
+    async editRole(){
+       this.dialogFormEditVisible = false
+
+      const res = await this.$http.put('role/', this.form)
+      this.form = {}
+      const {
+        meta: { msg, status }
+      } = res.data
+      if (status === 200) {
+        this.$message.success(msg)
+      } else {
+        this.$message.warning(msg)
+      }
+      this.loadroles()
+    },
+
+
     async handleClose (row, rightid) {
       console.log('---close-', row, rightid)
-      const res = await this.$http.delete(`roles/${row.id}/rights/${rightid}`)
+      const res = await this.$http.put(`role/`,{"act":"delete_target_ps_to_role","id":row.id,"ps_id":rightid})
       const {
         data,
         meta: { msg, status }
       } = res.data
       if (status === 200) {
         this.$message.success(msg)
-        row.children = data
+        row.children = data.children
       } else {
         this.$message.warning(msg)
       }

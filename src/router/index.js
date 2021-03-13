@@ -21,7 +21,7 @@ const router = new Router({
     component: Home,
     children: [{
       name: 'user',
-      path: '/users',
+      path: '/api/user',
       component: User
     }, 
     {
@@ -31,7 +31,7 @@ const router = new Router({
     },
      {
       name: 'roles',
-      path: '/roles',
+      path: '/api/role',
       component: Roles
     },
     {
@@ -70,8 +70,10 @@ const router = new Router({
 })
 
 router.beforeEach((to, from, next) => {
+  console.log(to.path, '---hahaha-------------************-', from.path)
   if (to.path !== '/login' & to.path !== '/register') {
     const token = sessionStorage.getItem('token')
+    console.log(to.path, '0000000000000000000000000token===',token)
     if (!token) {
       router.push({ name: 'login' })
       Message.warning('请先登录')

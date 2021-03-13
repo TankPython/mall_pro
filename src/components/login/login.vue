@@ -3,10 +3,10 @@
     <el-form label-position="top" label-width="80px" :model="user" class="login-form">
       <h1>用户登录</h1>
       <el-form-item label="用户名">
-        <el-input v-model="user.username"></el-input>
+        <el-input v-model="user.name"></el-input>
       </el-form-item>
       <el-form-item label="密码">
-        <el-input v-model="user.password"></el-input>
+        <el-input v-model="user.password" show-password></el-input>
       </el-form-item>
       <el-button type="primary" @click="login" class="login-button">登录</el-button>
        <el-link class="register_link" @click="register" target="_blank">注册</el-link>
@@ -19,14 +19,14 @@ export default {
   data () {
     return {
       user: {
-        username: '',
+        name: '',
         password: ''
       }
     }
   },
   methods: {
     async login () {
-      const res = await this.$http.post('login', this.user)
+      const res = await this.$http.post('login/', this.user)
       const data = res.data
       const { meta: { status, msg } } = data
       if (status === 200) {
