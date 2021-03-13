@@ -242,10 +242,12 @@ export default {
       const res = await this.$http.post('user/', this.form)
       this.form = {}
       const {
-        data: { users },
         meta: { msg, status }
       } = res.data
       if (status === 200) {
+      const {
+        data: { users },
+      } = res.data
         this.tableData = users
         this.$message.success(msg)
       } else {

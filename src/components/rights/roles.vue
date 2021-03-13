@@ -182,11 +182,14 @@ export default {
         // 展示拥有的权限
         var templist = []
         console.log('row---', row)
-        // 只添加权限的最后一级就行
+        // 只添加权限的最后一，二级就行
         row.children.forEach(item => {
           // templist.push(item.id);
           item.children.forEach(item1 => {
             templist.push(item1.id);
+             item1.children.forEach(item2 => {
+              templist.push(item2.id)
+            })
           })
         })
         this.checkedId = templist
@@ -240,13 +243,14 @@ export default {
     },
 
     async addRole(){
+     
        this.dialogFormAddVisible = false
-
       const res = await this.$http.post('role/', this.form)
       this.form = {}
       const {
         meta: { msg, status }
       } = res.data
+
       if (status === 200) {
         this.$message.success(msg)
       } else {
