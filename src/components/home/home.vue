@@ -14,7 +14,8 @@
         </el-col>
         <el-col :span="2" class="loginout">
           <div class="grid-content bg-purple">
-            <a @click.prevent="loginout">退出</a>
+            <span v-text="user"></span>
+            <i class="el-icon-switch-button" @click.prevent="loginout"></i>
           </div>
         </el-col>
       </el-row>
@@ -50,7 +51,8 @@
 export default {
   data () {
     return {
-      menus: []
+      menus: [],
+      user:""
     }
   },
   created () {
@@ -60,6 +62,7 @@ export default {
     //   this.$message.warning('请先登录')
     //   return
     // }
+    this.getCurrentUser()
     this.getMenus()
   },
   methods: {
@@ -78,7 +81,18 @@ export default {
       if (status === 200) {
         this.menus = data
       }
-    }
+    },
+    async getCurrentUser () {
+      const res = await this.$http.get(`user/?act=self`)
+      const {
+        data,
+        meta: { status }
+      } = res.data
+      if (status === 200) {
+        this.user = data.name
+      }
+    },
+
   }
 }
 </script>
