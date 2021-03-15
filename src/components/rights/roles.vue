@@ -170,7 +170,7 @@ export default {
       this.dialogFormSetVisible = true
       // 显示所有的权限
       console.log('load---')
-      const res = await this.$http.get('menu/')
+      const res = await this.$http.get('menu/?act=right')
       const {
         data,
         meta: { msg, status }

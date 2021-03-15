@@ -1,7 +1,8 @@
 <template>
   <div class="register-wrap">
 
-<el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
+<el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm" label-width="200px" label-position="top" class="rigester-ruleForm">
+  <h1>用户注册</h1>
     <el-form-item label="名字" prop="name">
     <el-input v-model="ruleForm.name"></el-input>
   </el-form-item>
@@ -104,7 +105,13 @@
     /* 水平居中 */
     justify-content: center;
     align-items: center;
-};
+}
+.rigester-ruleForm{
+     width: 600px;
+    background-color:#fff;
+    padding: 30px;
+    border-radius: 5px;
+}
 
 
 </style>
